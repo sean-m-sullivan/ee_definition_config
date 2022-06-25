@@ -1,0 +1,178 @@
+---
+- name: Using role create job template
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    controller_hostname: https://controller.node
+    controller_username: admin
+    controller_password: secret123
+    controller_validate_certs: false
+    controller_configuration_credentials_secure_logging: false
+    controller_projects:
+      - name: EE build project
+        scm_type: git
+        scm_url: https://github.com/sean-m-sullivan/ee_definition_config.git
+        scm_branch: main
+        scm_update_on_launch: true
+        description: EE build project
+        organization: Default
+        wait: true
+        update: true
+    controller_inventories:
+      - name: Controller Hosts
+        organization: Default
+    controller_hosts:
+      - name: controller.node
+        inventory: Controller Hosts
+        variables:
+          ansible_connection: ssh
+          ansible_ssh_user: root 
+          ansible_ssh_pass: password
+    controller_credential_types:
+      - name: Registery Credentials
+        description: REST API Credential
+        kind: cloud
+        inputs:
+          fields:
+            - id: base_registery_username
+              type: string
+              label: RH Registery Username
+            - id: base_registery_password
+              type: string
+              label: RH Registery Password
+              secret: true
+            - id: ee_registry_username
+              type: string
+              label: AH Registery Username
+            - id: ee_registry_password
+              type: string
+              label: AH Registery Password
+              secret: true
+            - id: ee_ah_host
+              type: string
+              label: AH Hostname
+            - id: ee_ah_token
+              type: string
+              label: AH Token
+              secret: true
+            - id: ee_validate_certs
+              type: boolean
+              default: false
+              label: Validate certs
+          required:
+            - base_registery_username
+            - base_registery_password
+        injectors:
+          extra_vars:
+            base_registery_username: "{% raw %}{  { base_registery_username }}{% endraw %}"
+            base_registery_password: "{% raw %}{  { base_registery_password }}{% endraw %}"
+            ee_registry_username: "{% raw %}{  { ee_registry_username }}{% endraw %}"
+            ee_registry_password: "{% raw %}{  { ee_registry_password }}{% endraw %}"
+            ee_validate_certs: "{% raw %}{  { ee_validate_certs }}{% endraw %}"
+            ee_ah_host: "{% raw %}{  { ee_ah_host }}{% endraw %}"
+            ee_ah_token: "{% raw %}{  { ee_ah_token }}{% endraw %}"
+    controller_credentials:
+      - credential_type: Registery Credentials
+        name: Execution Build Credentials
+        organization: Default
+        inputs:
+          base_registery_username: rhn-gps-ssulliva
+          base_registery_password: !vault |
+                    $ANSIBLE_VAULT;1.1;AES256
+                    38343138643736376337626664646137363764393037396162643730346234663035646562646338
+                    6531323731363538353063383661326334626234363834660a623463396433653034343934336466
+                    32363431646462313966323633343837656666643935353561323663616266323962643435303034
+                    6239363439666330350a653062306361363966336236363332326265653366386334316533323763
+                    3238
+          ee_registry_username: admin
+          ee_registry_password: secret123
+          ee_validate_certs: false
+          ee_ah_host: ahnosso.node
+          ee_ah_token: !vault |
+                    $ANSIBLE_VAULT;1.1;AES256
+                    66633532373930643830653433313866353961333939663065373436363162316433383639363262
+                    3466363065343938393136393734313832326434376635390a616466653663656233356433653832
+                    38313564326233623336373865646137386263383161663937303136636439373964303337373538
+                    3333303837376234350a373061303532623937363932363661396638323264666265336530396635
+                    34326437333061613133366339316531333134323862393163636436636663623339373739646639
+                    3735326135633130393036363863306237353831656461313138
+    controller_templates:
+      - name: Execution Environment Builder
+        job_type: run
+        inventory: Controller Hosts
+        credentials:
+          - Execution Build Credentials
+          - base_vault
+        project: EE build project
+        playbook: ee_builder_survey.yaml
+        verbosity: 1
+        extra_vars:
+          ee_registry_dest: ahnosso.node
+        survey_enabled: true
+        survey_spec:
+          name: Execution builder survey
+          description: Description goes here
+          spec:
+            - question_name: Image name
+              question_description: Name of the image to push including optional tag.
+              required: true
+              type: text
+              variable: survey_image_name
+              min: 0
+              max: 1034
+            - question_name: Base Image to use, defaults to ee-minimal
+              question_description: Name of the base image to use, including optional tag.
+              required: false
+              type: text
+              variable: survey_base_image
+              default: registry.redhat.io/ansible-automation-platform-22/ee-minimal-rhel8:latest
+              min: 0
+              max: 1034
+            - question_name: List of bindep requirements
+              question_description: line seperated list
+              required: false
+              type: textarea
+              variable: survey_bindep
+              min: 0
+              max: 5000
+            - question_name: List of python requirements
+              question_description: line seperated list
+              required: false
+              type: textarea
+              variable: survey_python
+              min: 0
+              max: 5000
+            - question_name: List of collection requirements
+              question_description: line seperated list, galaxy format
+              required: false
+              type: textarea
+              variable: survey_collections
+              min: 0
+              max: 5000
+            - question_name: List of prepend arguments
+              question_description: line seperated list
+              required: false
+              type: textarea
+              variable: survey_prepend
+              min: 0
+              max: 5000
+            - question_name: List of append arguments
+              question_description: line seperated list
+              required: false
+              type: textarea
+              variable: survey_append
+              min: 0
+              max: 5000
+
+  collections:
+    - awx.awx
+    - redhat_cop.controller_configuration
+  roles:
+    - redhat_cop.controller_configuration.credential_types
+    - redhat_cop.controller_configuration.credentials
+    - redhat_cop.controller_configuration.inventories
+    - redhat_cop.controller_configuration.hosts
+    - redhat_cop.controller_configuration.projects
+    - redhat_cop.controller_configuration.job_templates
+...

@@ -1,0 +1,71 @@
+---
+- name: Playbook to create custom EE
+  hosts: controller.node
+  gather_facts: false
+  collections:
+    - redhat_cop.ee_utilities
+  vars:
+    ee_registry_dest: ahnosso.node
+    survey_base_image: 'registry.redhat.io/ansible-automation-platform-22/ee-minimal-rhel8:latest'
+    survey_image_name: custom_ee
+    survey_bindep: |-
+      python38-requests [platform:centos-8 platform:rhel-8]
+      python38-pyyaml [platform:centos-8 platform:rhel-8]
+    survey_python: |-
+      pytz
+      python-dateutil>=2.7.0
+      awxkit
+    survey_collections: |-
+      collections:
+        - name: awx.awx
+          version: 12.0.0
+        - name: redhat_cop.controller_configuration
+        - name: redhat_cop.ah_configuration
+    survey_prepend: |-
+      RUN whoami
+      RUN cat /etc/os-release
+    survey_append: RUN echo This is a post-install command!
+
+  pre_tasks:
+    - name: Template out collection requirements
+      ansible.builtin.template:
+        src: requirements.yaml.j2
+        dest: "/tmp/__requirements.yaml"
+
+    - name: Template out collection requirements
+      ansible.builtin.template:
+        src: requirements.yaml.j2
+        dest: "{{ playbook_dir }}/__requirements.yaml"
+      delegate_to: localhost
+
+    - name: Eat the requirements file.
+      ansible.builtin.include_vars:
+        file: "{{ playbook_dir }}/__requirements.yaml"
+        name: __reqs
+      delegate_to: localhost
+
+    - name: display multiple file contents
+      ansible.builtin.debug: 
+        var: item
+      with_file:
+        - "{{ playbook_dir }}/__requirements.yaml"
+      delegate_to: localhost
+
+  tasks:
+    - name: Set Build dir fact.
+      ansible.builtin.set_fact:
+        ee_ah_host: ahnosso.node
+        ee_ah_token: 4ab76668c4b2622ab1dfb7cbee7e6c9b8e62c0f5
+        ee_list:
+          - name: "{{ survey_image_name }}"
+            base_image: "{{ survey_base_image | default(omit, true) }}"
+            bindep: "{{ survey_bindep.split('\n') }}"
+            python: "{{ survey_python.split('\n') }}"
+            collections: "{{ __reqs.collections }}"
+            prepend: "{{ survey_prepend.split('\n') }}"
+            append: "{{ survey_append.split('\n') }}"
+
+    - ansible.builtin.include_role:
+        name: redhat_cop.ee_utilities.ee_builder
+
+...

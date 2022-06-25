@@ -1,0 +1,32 @@
+---
+- name: Playbook to create custom EE
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - redhat_cop.ee_utilities
+
+  vars:
+    survey_collections: |-
+      collections:
+        - name: awx.awx
+          version: 12.0.0
+        - name: redhat_cop.controller_configuration
+        - name: redhat_cop.ah_configuration
+
+  tasks:
+    - name: debug python list
+      ansible.builtin.template:
+        src: requirements.yaml.j2
+        dest: /tmp/requirements.yaml
+
+    - name: Eat the requirements file.
+      ansible.builtin.include_vars:
+        file: /tmp/requirements.yaml
+        name: __reqs
+    - name: debug python list
+      ansible.builtin.debug:
+        var: __reqs.collections
+
+#  roles:
+#    - redhat_cop.ee_utilities.ee_builder
+...
