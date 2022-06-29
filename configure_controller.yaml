@@ -4,7 +4,7 @@
   connection: local
   gather_facts: false
   vars:
-    controller_hostname: https://controller.node
+    controller_hostname: https://controller
     controller_username: admin
     controller_password: secret123
     controller_validate_certs: false
@@ -23,11 +23,11 @@
       - name: Controller Hosts
         organization: Default
     controller_hosts:
-      - name: controller.node
+      - name: controller
         inventory: Controller Hosts
         variables:
           ansible_connection: ssh
-          ansible_ssh_user: root 
+          ansible_ssh_user: root
           ansible_ssh_pass: password
     controller_credential_types:
       - name: Registery Credentials
@@ -88,22 +88,14 @@
           ee_registry_username: admin
           ee_registry_password: secret123
           ee_validate_certs: false
-          ee_ah_host: ahnosso.node
-          ee_ah_token: !vault |
-                    $ANSIBLE_VAULT;1.1;AES256
-                    66633532373930643830653433313866353961333939663065373436363162316433383639363262
-                    3466363065343938393136393734313832326434376635390a616466653663656233356433653832
-                    38313564326233623336373865646137386263383161663937303136636439373964303337373538
-                    3333303837376234350a373061303532623937363932363661396638323264666265336530396635
-                    34326437333061613133366339316531333134323862393163636436636663623339373739646639
-                    3735326135633130393036363863306237353831656461313138
+          ee_ah_host: sso
+          ee_ah_token: a1a0c799ddbd37c2ea6cc41173f1e9a2b11cb343
     controller_templates:
       - name: Execution Environment Builder
         job_type: run
         inventory: Controller Hosts
         credentials:
           - Execution Build Credentials
-          - base_vault
         project: EE build project
         playbook: ee_builder_survey.yaml
         verbosity: 1

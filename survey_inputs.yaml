@@ -1,0 +1,20 @@
+name: custom_ee
+# base_image
+bindep:
+python38-requests [platform:centos-8 platform:rhel-8]
+python38-pyyaml [platform:centos-8 platform:rhel-8]
+python:
+pytz
+python-dateutil>=2.7.0
+awxkit
+# use entire section lines 11-16 including collection yaml header.
+collections:
+  - name: awx.awx
+    version: 12.0.0
+  - name: redhat_cop.controller_configuration
+  - name: redhat_cop.ah_configuration
+prepend:
+RUN whoami
+RUN cat /etc/os-release
+append:
+RUN echo This is a post-install command!
