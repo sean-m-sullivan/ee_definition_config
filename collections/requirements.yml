@@ -1,7 +1,7 @@
 ---
 collections:
   - name: redhat_cop.ee_utilities
-  - name: ansible.controller
+  - name: awx.awx
   - name: redhat_cop.controller_configuration
   - name: containers.podman
 ...
