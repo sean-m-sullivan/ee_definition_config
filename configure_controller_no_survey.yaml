@@ -1,0 +1,115 @@
+---
+- name: Using role create job template
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    controller_hostname: https://student2.rheb00.example.opentlc.com
+    controller_username: admin
+    controller_password: 7RzLPtQdjBRmhX
+    controller_validate_certs: false
+    controller_projects:
+      - name: EE build project
+        scm_type: git
+        scm_url: https://github.com/sean-m-sullivan/ee_definition_config.git
+        scm_branch: main
+        scm_update_on_launch: false
+        description: EE build project
+        organization: Default
+        wait: true
+        update: false
+    controller_inventories:
+      - name: AAP Hosts
+        organization: Default
+    controller_hosts:
+      - name: 13.58.114.243
+        inventory: AAP Hosts
+        variables:
+          ansible_connection: ssh
+          ansible_ssh_user: student
+          ansible_ssh_pass: 7RzLPtQdjBRmhX
+    controller_credential_types:
+      - name: Registery Credentials
+        description: REST API Credential
+        kind: cloud
+        inputs:
+          fields:
+            - id: base_registery_username
+              type: string
+              label: RH Registery Username
+            - id: base_registery_password
+              type: string
+              label: RH Registery Password
+              secret: true
+            - id: ee_registry_username
+              type: string
+              label: AH Registery Username
+            - id: ee_registry_password
+              type: string
+              label: AH Registery Password
+              secret: true
+            - id: ee_ah_host
+              type: string
+              label: AH Hostname
+            - id: ee_ah_token
+              type: string
+              label: AH Token
+              secret: true
+            - id: ee_validate_certs
+              type: boolean
+              default: false
+              label: Validate certs
+          required:
+            - base_registery_username
+            - base_registery_password
+        injectors:
+          extra_vars:
+            base_registery_username: "{% raw %}{  { base_registery_username }}{% endraw %}"
+            base_registery_password: "{% raw %}{  { base_registery_password }}{% endraw %}"
+            ee_registry_username: "{% raw %}{  { ee_registry_username }}{% endraw %}"
+            ee_registry_password: "{% raw %}{  { ee_registry_password }}{% endraw %}"
+            ee_validate_certs: "{% raw %}{  { ee_validate_certs }}{% endraw %}"
+            ee_ah_host: "{% raw %}{  { ee_ah_host }}{% endraw %}"
+            ee_ah_token: "{% raw %}{  { ee_ah_token }}{% endraw %}"
+    controller_credentials:
+      - credential_type: Registery Credentials
+        name: Execution Build Credentials
+        organization: Default
+        inputs:
+          base_registery_username: rhn-gps-ssulliva
+          base_registery_password: !vault |
+                    $ANSIBLE_VAULT;1.1;AES256
+                    38343138643736376337626664646137363764393037396162643730346234663035646562646338
+                    6531323731363538353063383661326334626234363834660a623463396433653034343934336466
+                    32363431646462313966323633343837656666643935353561323663616266323962643435303034
+                    6239363439666330350a653062306361363966336236363332326265653366386334316533323763
+                    3238
+          ee_registry_username: admin
+          ee_registry_password: 7RzLPtQdjBRmhX
+          ee_validate_certs: false
+          ee_ah_host: hub-student2.rheb00.example.opentlc.com
+          ee_ah_token: 3db2988440c31cc46ee2ca59e8427169e2673ade
+    controller_templates:
+      - name: Execution Environment Builder
+        job_type: run
+        inventory: AAP Hosts
+        credentials:
+          - Execution Build Credentials
+        project: EE build project
+        playbook: ee_builder_controller.yaml
+        verbosity: 1
+        extra_vars:
+          ee_registry_dest: hub-student2.rheb00.example.opentlc.com
+          ee_builder_dir_clean: true
+          ee_create_ansible_config: false
+  collections:
+    - awx.awx
+    - redhat_cop.controller_configuration
+  roles:
+    - redhat_cop.controller_configuration.credential_types
+    - redhat_cop.controller_configuration.credentials
+    - redhat_cop.controller_configuration.inventories
+    - redhat_cop.controller_configuration.hosts
+    - redhat_cop.controller_configuration.projects
+    - redhat_cop.controller_configuration.job_templates
+...
