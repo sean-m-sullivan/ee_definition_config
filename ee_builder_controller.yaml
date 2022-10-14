@@ -6,7 +6,7 @@
     - redhat_cop.ee_utilities
   vars:
     ee_list:
-      - name: custom_ee
+      - ee_name: custom_ee
         # base_image
         bindep:
           - python38-requests [platform:centos-8 platform:rhel-8]
