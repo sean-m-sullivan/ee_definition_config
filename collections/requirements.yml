@@ -3,5 +3,6 @@ collections:
   - name: redhat_cop.ee_utilities
   - name: awx.awx
   - name: redhat_cop.controller_configuration
+  - name: redhat_cop.ah_configuration
   - name: containers.podman
 ...

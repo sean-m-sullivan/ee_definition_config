@@ -4,10 +4,11 @@
   connection: local
   gather_facts: false
   vars:
-    controller_hostname: https://student2.rheb00.example.opentlc.com
+    controller_hostname: https://controller.nas/
     controller_username: admin
-    controller_password: 7RzLPtQdjBRmhX
+    controller_password: secret123
     controller_validate_certs: false
+    controller_configuration_async_delay: 3
     controller_projects:
       - name: EE build project
         scm_type: git
@@ -21,13 +22,19 @@
     controller_inventories:
       - name: AAP Hosts
         organization: Default
+      - name: Blank (localhost only)
+        organization: Default
     controller_hosts:
-      - name: 13.58.114.243
+      - name: 10.242.42.80
         inventory: AAP Hosts
         variables:
           ansible_connection: ssh
-          ansible_ssh_user: student
-          ansible_ssh_pass: 7RzLPtQdjBRmhX
+          ansible_ssh_user: excalibrax
+          ansible_ssh_pass: password
+      - name: localhost
+        inventory: Blank (localhost only)
+        variables:
+          ansible_connection: local
     controller_credential_types:
       - name: Registery Credentials
         description: REST API Credential
@@ -64,19 +71,23 @@
             - base_registery_password
         injectors:
           extra_vars:
-            base_registery_username: "{% raw %}{  { base_registery_username }}{% endraw %}"
-            base_registery_password: "{% raw %}{  { base_registery_password }}{% endraw %}"
-            ee_registry_username: "{% raw %}{  { ee_registry_username }}{% endraw %}"
-            ee_registry_password: "{% raw %}{  { ee_registry_password }}{% endraw %}"
-            ee_validate_certs: "{% raw %}{  { ee_validate_certs }}{% endraw %}"
-            ee_ah_host: "{% raw %}{  { ee_ah_host }}{% endraw %}"
-            ee_ah_token: "{% raw %}{  { ee_ah_token }}{% endraw %}"
+            base_registery_username: !unsafe "{{ base_registery_username }}"
+            base_registery_password: !unsafe "{{ base_registery_password }}"
+            ee_registry_username: !unsafe "{{ ee_registry_username }}"
+            ee_registry_password: !unsafe "{{ ee_registry_password }}"
+            ee_validate_certs: !unsafe "{{ ee_validate_certs }}"
+            ah_validate_certs: !unsafe "{{ ee_validate_certs }}"
+            ee_ah_host: !unsafe "{{ ee_ah_host }}"
+            ee_ah_token: !unsafe "{{ ee_ah_token }}"
+            ah_host: !unsafe "{{ ee_ah_host }}"
+            ah_username: !unsafe "{{ ee_registry_username }}"
+            ah_password: !unsafe "{{ ee_registry_password }}"
     controller_credentials:
       - credential_type: Registery Credentials
         name: Execution Build Credentials
         organization: Default
         inputs:
-          base_registery_username: rhn-aabbcc
+          base_registery_username: rhn-username
           base_registery_password: !vault |
                     $ANSIBLE_VAULT;1.1;AES256
                     38343138643736376337626664646137363764393037396162643730346234663035646562646338
@@ -85,10 +96,17 @@
                     6239363439666330350a653062306361363966336236363332326265653366386334316533323763
                     3238
           ee_registry_username: admin
-          ee_registry_password: 7RzLPtQdjBRmhX
+          ee_registry_password: secret123
           ee_validate_certs: false
-          ee_ah_host: hub-student2.rheb00.example.opentlc.com
-          ee_ah_token: 3db2988440c31cc46ee2ca59e8427169e2673ade
+          ee_ah_host: hub.nas
+          ee_ah_token: 06a6cabd76f3f55a4e45999b9452c1208b87f10c
+      - credential_type: Red Hat Ansible Automation Platform
+        name: Controller
+        inputs:
+          host: 10.242.42.231
+          username: admin
+          password: secret123
+          verify_ssl: false
     controller_templates:
       - name: Execution Environment Builder
         job_type: run
@@ -96,12 +114,37 @@
         credentials:
           - Execution Build Credentials
         project: EE build project
+        execution_environment: Default execution environment
         playbook: ee_builder_controller.yaml
-        verbosity: 1
         extra_vars:
-          ee_registry_dest: hub-student2.rheb00.example.opentlc.com
+          ee_registry_dest: hub.nas
           ee_builder_dir_clean: true
-          ee_create_ansible_config: false
+      - name: Push Execution Environments to Controller
+        job_type: run
+        inventory: Blank (localhost only)
+        credentials:
+          - Controller
+        project: EE build project
+        execution_environment: Default execution environment
+        playbook: push_to_controller.yaml
+    controller_workflows:
+      - name: Update Execution Environments
+        workflow_nodes:
+          - identifier: Build EE's
+            unified_job_template:
+              name: Execution Environment Builder
+              type: job_template
+              organization:
+                name: Default
+            related:
+              success_nodes:
+                - identifier: Push EE's to controller
+          - identifier: Push EE's to controller
+            unified_job_template:
+              name: Push Execution Environments to Controller
+              type: job_template
+              organization:
+                name: Default
   collections:
     - awx.awx
     - redhat_cop.controller_configuration
@@ -112,4 +155,5 @@
     - redhat_cop.controller_configuration.hosts
     - redhat_cop.controller_configuration.projects
     - redhat_cop.controller_configuration.job_templates
+    - redhat_cop.controller_configuration.workflow_job_templates
 ...
