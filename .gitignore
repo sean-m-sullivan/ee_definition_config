@@ -1,3 +1,4 @@
 .password
 ansible-navigator.log
 *.json
+ansible.cfg

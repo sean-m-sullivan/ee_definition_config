@@ -9,6 +9,7 @@
     controller_password: secret123
     controller_validate_certs: false
     controller_configuration_async_delay: 3
+    controller_configuration_secure_logging: false
     controller_projects:
       - name: EE build project
         scm_type: git
@@ -25,11 +26,11 @@
       - name: Blank (localhost only)
         organization: Default
     controller_hosts:
-      - name: 10.242.42.80
+      - name: 10.242.42.143
         inventory: AAP Hosts
         variables:
           ansible_connection: ssh
-          ansible_ssh_user: excalibrax
+          ansible_ssh_user: awx
           ansible_ssh_pass: password
       - name: localhost
         inventory: Blank (localhost only)
@@ -55,10 +56,10 @@
               type: string
               label: AH Registery Password
               secret: true
-            - id: ee_ah_host
+            - id: ah_host
               type: string
               label: AH Hostname
-            - id: ee_ah_token
+            - id: ah_token
               type: string
               label: AH Token
               secret: true
@@ -71,23 +72,19 @@
             - base_registery_password
         injectors:
           extra_vars:
-            base_registery_username: !unsafe "{{ base_registery_username }}"
-            base_registery_password: !unsafe "{{ base_registery_password }}"
+            ee_base_registry_username: !unsafe "{{ base_registery_username }}"
+            ee_base_registry_password: !unsafe "{{ base_registery_password }}"
             ee_registry_username: !unsafe "{{ ee_registry_username }}"
             ee_registry_password: !unsafe "{{ ee_registry_password }}"
             ee_validate_certs: !unsafe "{{ ee_validate_certs }}"
-            ah_validate_certs: !unsafe "{{ ee_validate_certs }}"
-            ee_ah_host: !unsafe "{{ ee_ah_host }}"
-            ee_ah_token: !unsafe "{{ ee_ah_token }}"
-            ah_host: !unsafe "{{ ee_ah_host }}"
-            ah_username: !unsafe "{{ ee_registry_username }}"
-            ah_password: !unsafe "{{ ee_registry_password }}"
+            ah_host: !unsafe "{{ ah_host }}"
+            ah_token: !unsafe "{{ ah_token }}"
     controller_credentials:
       - credential_type: Registery Credentials
         name: Execution Build Credentials
         organization: Default
         inputs:
-          base_registery_username: rhn-username
+          base_registery_username: rhn-gps-ssulliva
           base_registery_password: !vault |
                     $ANSIBLE_VAULT;1.1;AES256
                     38343138643736376337626664646137363764393037396162643730346234663035646562646338
@@ -98,10 +95,11 @@
           ee_registry_username: admin
           ee_registry_password: secret123
           ee_validate_certs: false
-          ee_ah_host: hub.nas
-          ee_ah_token: 06a6cabd76f3f55a4e45999b9452c1208b87f10c
+          ah_host: hub.nas
+          ah_token: 06a6cabd76f3f55a4e45999b9452c1208b87f10c
       - credential_type: Red Hat Ansible Automation Platform
-        name: Controller
+        name: Controller Credential
+        organization: Default
         inputs:
           host: 10.242.42.231
           username: admin
@@ -114,7 +112,7 @@
         credentials:
           - Execution Build Credentials
         project: EE build project
-        execution_environment: Default execution environment
+        execution_environment: Automation Hub Minimal execution environment
         playbook: ee_builder_controller.yaml
         extra_vars:
           ee_registry_dest: hub.nas
@@ -123,9 +121,9 @@
         job_type: run
         inventory: Blank (localhost only)
         credentials:
-          - Controller
+          - Controller Credential
         project: EE build project
-        execution_environment: Default execution environment
+        execution_environment: Automation Hub Minimal execution environment
         playbook: push_to_controller.yaml
     controller_workflows:
       - name: Update Execution Environments

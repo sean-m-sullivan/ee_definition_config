@@ -3,10 +3,10 @@
   hosts: all
   gather_facts: false
   collections:
-    - redhat_cop.controller_configuration
+    - infra.controller_configuration
 
   tasks:
     - name: Add Execution Environment
       include_role:
-        name: redhat_cop.controller_configuration.execution_environments
+        name: infra.controller_configuration.execution_environments
 ...
