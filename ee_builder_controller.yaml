@@ -8,7 +8,7 @@
     # For controller configuration definition
     ee_reg_credential: Automation Hub Container Registry
     ee_list:
-      - ee_name: custom_ee
+      - name: custom_ee
         alt_name: Custom EE
         tag: 1-11-21-2
         # base_image
@@ -30,5 +30,5 @@
         append:
           - RUN echo This is a post-install command!
   roles:
-    - redhat_cop.ee_utilities.ee_builder
+    - infra.ee_utilities.ee_builder
 ...
