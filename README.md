@@ -26,6 +26,7 @@ Playbook that when pointed at a Tower will create Execution environments based o
 Test file for testing survey options
 
 ## Running this on a container
+This is NOT Recomended to do, it will run all containers in privledged mode. "user root inside of a container will have the same access as root on the host system"
 Building an EE will work if on a container, the following option needs to be changed in the Automation controller.
 /var/lib/awx/venv/awx/lib/python3.9/site-packages/awx/settings/defaults.py
 ```text

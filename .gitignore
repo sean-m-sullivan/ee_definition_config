@@ -2,3 +2,5 @@
 ansible-navigator.log
 *.json
 ansible.cfg
+test.yml
+tona_test.yml

@@ -3,12 +3,14 @@
   hosts: all
   gather_facts: false
   collections:
-    - redhat_cop.ee_utilities
+    - infra.ee_utilities
   vars:
     # For controller configuration definition
     ee_reg_credential: Automation Hub Container Registry
+    ee_builder_image: registry.redhat.io/ansible-automation-platform-23/ansible-builder-rhel8:latest
+    ee_base_image: registry.redhat.io/ansible-automation-platform-22/ee-minimal-rhel8:latest
     ee_list:
-      - name: custom_ee
+      - ee_name: custom_ee
         alt_name: Custom EE
         tag: 1-11-21-2
         # base_image
@@ -22,8 +24,8 @@
         collections:
           - name: awx.awx
             version: 21.9.0
-          - name: redhat_cop.controller_configuration
-          - name: redhat_cop.ah_configuration
+          - name: infra.controller_configuration
+          - name: infra.ah_configuration
         prepend:
           - RUN whoami
           - RUN cat /etc/os-release

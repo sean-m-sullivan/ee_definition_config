@@ -36,7 +36,7 @@
         variables:
           ansible_connection: local
     controller_credential_types:
-      - name: Registery Credentials
+      - name: Registry Credentials
         description: REST API Credential
         kind: cloud
         inputs:
@@ -79,7 +79,7 @@
             ah_host: !unsafe "{{ ah_host }}"
             ah_token: !unsafe "{{ ah_token }}"
     controller_credentials:
-      - credential_type: Registery Credentials
+      - credential_type: Registry Credentials
         name: Execution Build Credentials
         organization: Default
         inputs:
@@ -95,7 +95,7 @@
           ee_registry_password: secret123
           ee_validate_certs: false
           ah_host: hub.nas
-          ah_token: 55987617133a0ef2585446c73bd8340e5b17e07f
+          ah_token: 16fd981f4fc296befe8374ab453ddd4f541deb5b
       - credential_type: Red Hat Ansible Automation Platform
         name: Controller Credential
         organization: Default
@@ -143,14 +143,14 @@
               organization:
                 name: Default
   collections:
-    - awx.awx
-    - redhat_cop.controller_configuration
+    - ansible.controller
+    - infra.controller_configuration
   roles:
-    - redhat_cop.controller_configuration.credential_types
-    - redhat_cop.controller_configuration.credentials
-    - redhat_cop.controller_configuration.inventories
-    - redhat_cop.controller_configuration.hosts
-    - redhat_cop.controller_configuration.projects
-    - redhat_cop.controller_configuration.job_templates
-    - redhat_cop.controller_configuration.workflow_job_templates
+    - infra.controller_configuration.credential_types
+    - infra.controller_configuration.credentials
+    - infra.controller_configuration.inventories
+    - infra.controller_configuration.hosts
+    - infra.controller_configuration.projects
+    - infra.controller_configuration.job_templates
+    - infra.controller_configuration.workflow_job_templates
 ...
