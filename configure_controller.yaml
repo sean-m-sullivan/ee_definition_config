@@ -77,7 +77,7 @@
         name: Execution Build Credentials
         organization: Default
         inputs:
-          base_registery_username: rhn-gps-ssulliva
+          base_registery_username: rhn-username
           base_registery_password: !vault |
                     $ANSIBLE_VAULT;1.1;AES256
                     38343138643736376337626664646137363764393037396162643730346234663035646562646338

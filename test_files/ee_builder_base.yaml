@@ -5,7 +5,7 @@
   collections:
     - redhat_cop.ee_utilities
   vars:
-    ee_registry_dest: ahnosso.node
+    ee_registry_dest: hub.nas
     ee_builder_dir_clean: true
     base_registery_username: rhn-username
     base_registery_password: !vault |
@@ -15,13 +15,15 @@
               32363431646462313966323633343837656666643935353561323663616266323962643435303034
               6239363439666330350a653062306361363966336236363332326265653366386334316533323763
               3238
-    ee_ah_host: ahnosso.node
-    ee_ah_token: 4ab76668c4b2622ab1dfb7cbee7e6c9b8e62c0f5
+    ah_host: hub.nas
+    ah_token: 55987617133a0ef2585446c73bd8340e5b17e07f
     ee_registry_username: admin
     ee_registry_password: secret123
+    ee_reg_credential: Automation Hub Container Registry
     ee_list:
-      - name: custom_ee
-        # base_image
+      - ee_name: custom_ee
+        alt_name: Custom EE
+        tag: 1-11-21-2
         bindep:
           - python38-requests [platform:centos-8 platform:rhel-8]
           - python38-pyyaml [platform:centos-8 platform:rhel-8]

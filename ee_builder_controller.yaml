@@ -4,11 +4,7 @@
   gather_facts: false
   collections:
     - redhat_cop.ee_utilities
-    - redhat_cop.controller_configuration
   vars:
-    # For ansible.cfg generation
-    ah_token: "{{ ee_ah_token }}"
-    ah_host: "{{ ee_ah_host }}"
     # For controller configuration definition
     ee_reg_credential: Automation Hub Container Registry
     ee_list:

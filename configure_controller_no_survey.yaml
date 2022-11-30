@@ -9,7 +9,6 @@
     controller_password: secret123
     controller_validate_certs: false
     controller_configuration_async_delay: 3
-    controller_configuration_secure_logging: false
     controller_projects:
       - name: EE build project
         scm_type: git
@@ -84,7 +83,7 @@
         name: Execution Build Credentials
         organization: Default
         inputs:
-          base_registery_username: rhn-gps-ssulliva
+          base_registery_username: rhn-username
           base_registery_password: !vault |
                     $ANSIBLE_VAULT;1.1;AES256
                     38343138643736376337626664646137363764393037396162643730346234663035646562646338
@@ -96,12 +95,12 @@
           ee_registry_password: secret123
           ee_validate_certs: false
           ah_host: hub.nas
-          ah_token: 06a6cabd76f3f55a4e45999b9452c1208b87f10c
+          ah_token: 55987617133a0ef2585446c73bd8340e5b17e07f
       - credential_type: Red Hat Ansible Automation Platform
         name: Controller Credential
         organization: Default
         inputs:
-          host: 10.242.42.231
+          host: 10.242.42.150
           username: admin
           password: secret123
           verify_ssl: false
