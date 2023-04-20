@@ -1,5 +1,6 @@
 # ee_definition_config
 Use the EE builder using configuration Job in Controller
+[Blog post discussing how to use this repo](https://www.redhat.com/architect/ansible-execution-environment-automated-build)
 
 ## Files and purposes
 
