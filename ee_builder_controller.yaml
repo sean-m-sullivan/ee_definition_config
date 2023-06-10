@@ -7,8 +7,6 @@
   vars:
     # For controller configuration definition
     ee_reg_credential: Automation Hub Container Registry
-    ee_builder_image: registry.redhat.io/ansible-automation-platform-23/ansible-builder-rhel8:latest
-    ee_base_image: registry.redhat.io/ansible-automation-platform-22/ee-minimal-rhel8:latest
     ee_list:
       - ee_name: custom_ee
         alt_name: Custom EE
