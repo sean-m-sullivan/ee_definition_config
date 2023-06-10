@@ -1,6 +1,6 @@
 ---
 - name: Playbook to create custom EE
-  hosts: all
+  hosts: localhost
   gather_facts: false
   collections:
     - infra.ee_utilities
