@@ -65,13 +65,13 @@
             - base_registery_password
         injectors:
           extra_vars:
-            base_registery_username: "{% raw %}{  { base_registery_username }}{% endraw %}"
-            base_registery_password: "{% raw %}{  { base_registery_password }}{% endraw %}"
-            ee_registry_username: "{% raw %}{  { ee_registry_username }}{% endraw %}"
-            ee_registry_password: "{% raw %}{  { ee_registry_password }}{% endraw %}"
-            ee_validate_certs: "{% raw %}{  { ee_validate_certs }}{% endraw %}"
-            ee_ah_host: "{% raw %}{  { ee_ah_host }}{% endraw %}"
-            ee_ah_token: "{% raw %}{  { ee_ah_token }}{% endraw %}"
+            ee_base_registry_username: !unsafe "{{ base_registery_username }}"
+            ee_base_registry_password: !unsafe "{{ base_registery_password }}"
+            ee_registry_username: !unsafe "{{ ee_registry_username }}"
+            ee_registry_password: !unsafe "{{ ee_registry_password }}"
+            ee_validate_certs: !unsafe "{{ ee_validate_certs }}"
+            ah_host: !unsafe "{{ ah_host }}"
+            ah_token: !unsafe "{{ ah_token }}"
     controller_credentials:
       - credential_type: Registery Credentials
         name: Execution Build Credentials
@@ -88,8 +88,8 @@
           ee_registry_username: admin
           ee_registry_password: secret123
           ee_validate_certs: false
-          ee_ah_host: sso
-          ee_ah_token: a1a0c799ddbd37c2ea6cc41173f1e9a2b11cb343
+          ah_host: hub.nas
+          ah_token: a1a0c799ddbd37c2ea6cc41173f1e9a2b11cb343
     controller_templates:
       - name: Execution Environment Builder
         job_type: run
@@ -156,10 +156,6 @@
               variable: survey_append
               min: 0
               max: 5000
-
-  collections:
-    - awx.awx
-    - redhat_cop.controller_configuration
   roles:
     - redhat_cop.controller_configuration.credential_types
     - redhat_cop.controller_configuration.credentials

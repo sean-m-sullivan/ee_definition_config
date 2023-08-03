@@ -25,7 +25,7 @@
       - name: Blank (localhost only)
         organization: Default
     controller_hosts:
-      - name: 10.242.42.143
+      - name: 10.242.42.108
         inventory: AAP Hosts
         variables:
           ansible_connection: ssh
@@ -95,7 +95,7 @@
           ee_registry_password: secret123
           ee_validate_certs: false
           ah_host: hub.nas
-          ah_token: 16fd981f4fc296befe8374ab453ddd4f541deb5b
+          ah_token: 98d2f2b53c2fc9d8df66ab2d04917037e613f379
       - credential_type: Red Hat Ansible Automation Platform
         name: Controller Credential
         organization: Default
@@ -142,9 +142,6 @@
               type: job_template
               organization:
                 name: Default
-  collections:
-    - ansible.controller
-    - infra.controller_configuration
   roles:
     - infra.controller_configuration.credential_types
     - infra.controller_configuration.credentials

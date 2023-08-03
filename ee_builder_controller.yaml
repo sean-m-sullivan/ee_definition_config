@@ -2,35 +2,35 @@
 - name: Playbook to create custom EE
   hosts: all
   gather_facts: false
-  collections:
-    - infra.ee_utilities
   vars:
     # For controller configuration definition
     ee_reg_credential: Automation Hub Container Registry
-    ee_builder_image: registry.redhat.io/ansible-automation-platform-23/ansible-builder-rhel8:latest
     ee_base_image: registry.redhat.io/ansible-automation-platform-22/ee-minimal-rhel8:latest
     ee_list:
-      - ee_name: custom_ee
+      - name: custom_ee
         alt_name: Custom EE
         tag: 1-11-21-2
         # base_image
-        bindep:
-          - python38-requests [platform:centos-8 platform:rhel-8]
-          - python38-pyyaml [platform:centos-8 platform:rhel-8]
-        python:
-          - pytz  # for schedule_rrule lookup plugin
-          - python-dateutil>=2.7.0  # schedule_rrule
-          - awxkit  # For import and export modules
-        collections:
-          - name: awx.awx
-            version: 21.9.0
-          - name: infra.controller_configuration
-          - name: infra.ah_configuration
-        prepend:
-          - RUN whoami
-          - RUN cat /etc/os-release
-        append:
-          - RUN echo This is a post-install command!
+        dependencies:
+          system:
+            - python38-requests [platform:centos-8 platform:rhel-8]
+            - python38-pyyaml [platform:centos-8 platform:rhel-8]
+          python:
+            - pytz  # for schedule_rrule lookup plugin
+            - python-dateutil>=2.7.0  # schedule_rrule
+            - awxkit  # For import and export modules
+          galaxy:
+            collections:
+              - name: awx.awx
+                version: 22.6.0
+              - name: infra.controller_configuration
+              - name: infra.ah_configuration
+        build_steps:
+          prepend_final:
+            - RUN whoami
+            - RUN cat /etc/os-release
+          append_final:
+            - RUN echo This is a post-install command!
   roles:
     - infra.ee_utilities.ee_builder
 ...

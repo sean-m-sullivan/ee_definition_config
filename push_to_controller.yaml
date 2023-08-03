@@ -2,11 +2,9 @@
 - name: Playbook to create custom EE
   hosts: all
   gather_facts: false
-  collections:
-    - infra.controller_configuration
 
   tasks:
     - name: Add Execution Environment
-      include_role:
+      ansible.builtin.include_role:
         name: infra.controller_configuration.execution_environments
 ...
